@@ -1,0 +1,109 @@
+// ============================================================================
+// Pindo Design System — Animations
+// ============================================================================
+@import './tokens';
+
+// ── Keyframes ──
+
+// Continuous rotation (spinners, loaders).
+@keyframes pd-spin {
+  to { transform: rotate(360deg); }
+}
+
+// Opacity transitions.
+@keyframes pd-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pd-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+// Slide entries — element enters from a direction, ending at rest.
+// Pair with $pd-ease-decelerate.
+@keyframes pd-slide-up {
+  from { transform: translateY(16rpx); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pd-slide-down {
+  from { transform: translateY(-16rpx); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pd-slide-in-left {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes pd-slide-in-right {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+// Continuous breath — opacity pulse for skeleton screens, loading dots.
+@keyframes pd-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+// Scale-in with overshoot — pair with $pd-ease-spring for badge pop-in,
+// success checkmark, like-tap micro-interactions.
+@keyframes pd-bounce-in {
+  from { transform: scale(0.6); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+// ── Utility Classes ──
+
+// Enumerated transition properties — `transition: all` triggers paint on any
+// changing property and is a known performance / surprise hazard. The classes
+// below cover the common interactive cases; for finer-grained control use the
+// `pd-transition` mixin.
+.pd-transition {
+  transition:
+    background-color $pd-duration-fast $pd-ease-standard,
+    color $pd-duration-fast $pd-ease-standard,
+    border-color $pd-duration-fast $pd-ease-standard,
+    transform $pd-duration-fast $pd-ease-standard,
+    opacity $pd-duration-fast $pd-ease-standard;
+}
+
+.pd-fade-enter   { animation: pd-fade-in   $pd-duration-normal $pd-ease-decelerate; }
+.pd-fade-exit    { animation: pd-fade-out  $pd-duration-fast   $pd-ease-accelerate; }
+.pd-slide-up-enter    { animation: pd-slide-up    $pd-duration-normal $pd-ease-decelerate; }
+.pd-slide-down-enter  { animation: pd-slide-down  $pd-duration-normal $pd-ease-decelerate; }
+.pd-slide-left-enter  { animation: pd-slide-in-left  $pd-duration-normal $pd-ease-decelerate; }
+.pd-slide-right-enter { animation: pd-slide-in-right $pd-duration-normal $pd-ease-decelerate; }
+.pd-bounce-enter      { animation: pd-bounce-in $pd-duration-normal $pd-ease-spring; }
+
+.pd-spin  { animation: pd-spin  $pd-duration-loop      $pd-ease-linear   infinite; }
+.pd-pulse { animation: pd-pulse $pd-duration-loop-slow $pd-ease-standard infinite; }
+
+// ── Accessibility — Reduced motion ──
+// WCAG 2.3.3 + best practice: when the user opts into "Reduce Motion" at the
+// OS level, stop transforms/loops and shorten transitions to near-zero. This
+// rule applies to every component that uses our motion tokens or utility
+// classes — they don't need to opt in.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:        1ms !important;
+    animation-iteration-count: 1   !important;
+    transition-duration:       1ms !important;
+    scroll-behavior:           auto !important;
+  }
+
+  // Replace slide entries with cross-fades — translate motion is the most
+  // disorienting kind, while opacity changes are generally comfortable.
+  .pd-slide-up-enter,
+  .pd-slide-down-enter,
+  .pd-slide-left-enter,
+  .pd-slide-right-enter,
+  .pd-bounce-enter {
+    animation: pd-fade-in 1ms linear !important;
+  }
+}

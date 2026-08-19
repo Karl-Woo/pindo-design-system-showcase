@@ -1,0 +1,1656 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>拼团详情</title>
+    <style>
+      :root {
+        --status-bar-height: 20px;
+        --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f7f8fa;
+        overflow-x: hidden;
+      }
+
+      /* 隐藏滚动条但保持滚动功能 */
+      body {
+        -ms-overflow-style: none; /* IE和Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+
+      /* Webkit浏览器（Chrome、Safari） */
+      body::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* 导航栏 */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: calc(var(--status-bar-height) + 44px);
+        background: #ffffff;
+        z-index: 1000;
+        padding-top: var(--status-bar-height);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .navbar-content {
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+      }
+
+      .nav-left {
+        display: flex;
+        align-items: center;
+      }
+
+      .back-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 15px;
+      }
+
+      .nav-title {
+        font-size: 18px;
+        font-weight: 500;
+        color: #1d1d1d;
+      }
+
+      .share-icon {
+        width: 24px;
+        height: 24px;
+      }
+
+      /* 主内容区域 */
+      .main-container {
+        padding-top: calc(var(--status-bar-height) + 44px);
+        padding-bottom: calc(80px + var(--safe-area-bottom));
+      }
+
+      /* 地图区域 */
+      #map {
+        width: 100%;
+        height: 274px;
+        background: #f0f0f0;
+      }
+
+      /* 隐藏地图底部的版权信息、条款、键盘快捷键等，只保留Google logo */
+      #map .gm-style-cc,
+      #map .gm-style a[href^='https://maps.google.com/maps'],
+      #map .gm-style a[href^='https://www.google.com/intl'],
+      #map .gmnoprint:not(.gm-bundled-control),
+      #map .gm-style-mtc,
+      #map button[title='显示街景地图'],
+      #map button[title='Show Street Map'],
+      #map button[title='键盘快捷键'],
+      #map button[title='Keyboard shortcuts'] {
+        display: none !important;
+      }
+
+      /* 只保留Google logo */
+      #map
+        a[href^='https://maps.google.com/maps'][target='_blank'][title*='Google'] {
+        display: block !important;
+      }
+
+      /* 内容容器 */
+      .content-container {
+        margin-top: -2px;
+        position: relative;
+      }
+
+      /* 团详情卡片 */
+      .section-card {
+        background: #ffffff;
+        border-radius: 20px 20px 0 0;
+        margin-bottom: 10px;
+        padding: 20px;
+      }
+
+      .group-info {
+        margin-bottom: 20px;
+      }
+
+      .group-title {
+        font-weight: 500;
+        font-size: 20px;
+        color: #3d3d3d;
+        line-height: 22.5px;
+        margin-bottom: 10px;
+      }
+
+      .group-meta {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        font-size: 12px;
+        color: #666666;
+      }
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        margin-right: 4px;
+      }
+
+      .meta-icon {
+        width: 14px;
+        height: 14px;
+        margin-right: 2px;
+      }
+
+      .meta-divider {
+        font-weight: 700;
+        margin: 0 2px;
+      }
+
+      .price-info {
+        display: flex;
+        align-items: baseline;
+      }
+
+      .price-symbol {
+        font-size: 12px;
+        color: #f30000;
+        font-weight: 600;
+      }
+
+      .price-value {
+        font-size: 20px;
+        color: #f30000;
+        font-weight: 600;
+        margin: 0 2px;
+      }
+
+      .price-unit {
+        font-size: 12px;
+        color: #f30000;
+      }
+
+      /* 发货信息 */
+      .shipping-info {
+        padding: 15px;
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid #f4f4f4;
+      }
+
+      .shipping-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+
+      .shipping-label {
+        font-size: 12px;
+        color: #666666;
+        display: flex;
+        align-items: center;
+      }
+
+      .info-icon {
+        width: 13px;
+        height: 13px;
+        margin-left: 4px;
+      }
+
+      .shipping-value {
+        font-size: 12px;
+        color: #cb1d45;
+      }
+
+      .shipping-date {
+        font-size: 20px;
+        color: #333333;
+        margin-bottom: 20px;
+      }
+
+      .progress-container {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .progress-bar {
+        flex: 1;
+        height: 14px;
+        background: #f7f8fa;
+        border-radius: 55px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: #cb1d45;
+        border-radius: 55px;
+        transition: width 0.3s ease;
+      }
+
+      .progress-info {
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+      }
+
+      .progress-current {
+        font-weight: 500;
+        color: #3d3d3d;
+      }
+
+      .progress-sep {
+        color: #666666;
+        margin: 0 2px;
+      }
+
+      .progress-total {
+        font-weight: 500;
+        color: #666666;
+        /* margin-right: 5px; */
+      }
+
+      .members-info {
+        display: flex;
+        align-items: center;
+      }
+
+      .member-avatars {
+        display: flex;
+        margin-right: 5px;
+      }
+
+      .member-avatar {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 1px solid #ffffff;
+        margin-left: -8px;
+      }
+
+      .member-avatar:first-child {
+        margin-left: 0;
+      }
+
+      .member-count {
+        font-size: 12px;
+        color: #666666;
+      }
+
+      .cB {
+        color: #cb1d45 !important;
+        font-weight: 500;
+      }
+
+      /* 历史发货记录 */
+      .history-section,
+      .announcement-section,
+      .review-section {
+        margin-bottom: 10px;
+        background: #ffffff;
+        padding: 10px 14px 15px;
+      }
+
+      .section-title {
+        font-size: 16px;
+        color: #333333;
+        margin-bottom: 12px;
+        font-weight: 700;
+      }
+
+      .history-item {
+        margin-bottom: 8px;
+      }
+      .announcement-item {
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+      .history-item:last-child,
+      .announcement-item:last-child {
+        margin-bottom: 0;
+      }
+      .history-item {
+        display: flex;
+        justify-content: space-between;
+      }
+      .history-label,
+      .announcement-label {
+        font-size: 14px;
+        color: #333333;
+      }
+
+      .history-value {
+        color: #333333;
+        font-size: 14px;
+      }
+      .announcement-label {
+        font-size: 14px;
+        color: #333333;
+        font-weight: 700;
+      }
+      .announcement-content {
+        font-size: 14px;
+        color: #333333;
+        margin-top: 4px;
+        display: block;
+        white-space: pre-line; /* 保留接口返回的换行符 */
+      }
+
+      /* 用户评价 - 独立样式 */
+      .review-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .review-title-wrapper {
+        display: flex;
+        align-items: center;
+      }
+
+      .review-section-title {
+        font-size: 16px;
+        color: #333333;
+        line-height: 22px;
+        font-weight: 700;
+      }
+
+      .review-count {
+        font-size: 12px;
+        color: #666666;
+        margin-left: 4px;
+        line-height: 22px;
+      }
+
+      .review-view-all {
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        color: #666666;
+      }
+
+      .review-arrow-icon {
+        width: 14px;
+        height: 14px;
+      }
+
+      .review-item {
+        display: flex;
+        padding: 16px 0;
+        border-bottom: 0.5px solid #f0f0f0;
+      }
+
+      .review-item:last-child {
+        border-bottom: none;
+      }
+
+      .review-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 9px;
+        flex-shrink: 0;
+      }
+
+      .review-content-wrapper {
+        flex: 1;
+      }
+
+      .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+      }
+
+      .review-name {
+        font-size: 12px;
+        color: #333333;
+        font-weight: 500;
+      }
+
+      .review-time {
+        font-size: 11px;
+        color: #999999;
+      }
+
+      .review-rating-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 7px;
+        font-size: 11px;
+      }
+
+      .review-rating-row-group {
+        margin-bottom: 16px;
+      }
+
+      .review-stars {
+        display: flex;
+        margin-right: 10px;
+        gap: 2px;
+        align-items: center;
+      }
+
+      .review-star {
+        display: inline-block;
+      }
+
+      .review-star.filled {
+        width: 14px;
+        height: 14px;
+      }
+
+      .review-star.empty {
+        color: #e5e5e5;
+        font-size: 16px;
+        line-height: 1;
+        font-weight: 700;
+      }
+
+      .review-rating-text {
+        color: #f6c500;
+        margin-right: 10px;
+      }
+
+      .review-rating-label {
+        color: #aaaaaa;
+      }
+
+      .review-images {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+
+      .review-image {
+        width: calc((100% - 20px) / 3);
+        height: 88px;
+        border-radius: 4px;
+        object-fit: cover;
+      }
+
+      .review-content {
+        font-size: 14px;
+        color: #666666;
+        line-height: 20px;
+        text-align: justified;
+      }
+
+      /* 底部操作栏 */
+      .bottom-actions {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        padding: 10px 20px;
+        padding-bottom: calc(20px + var(--safe-area-bottom));
+        display: flex;
+        align-items: center;
+        z-index: 100;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .action-left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-right: 15px;
+      }
+
+      .collect-icon {
+        width: 24px;
+        height: 24px;
+        margin-bottom: 4px;
+      }
+
+      .collect-text {
+        font-size: 12px;
+        color: #666666;
+      }
+
+      .join-btn {
+        flex: 1;
+        background: #e30055;
+        border-radius: 12px;
+        padding: 12px 0;
+        text-align: center;
+      }
+
+      .join-btn.disabled {
+        background: #cccccc;
+        opacity: 0.6;
+      }
+
+      .join-btn.closed {
+        background: #aaaaaa;
+      }
+
+      .join-text {
+        font-size: 16px;
+        color: #ffffff;
+      }
+
+      /* Loading */
+      .loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 2000;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 20px;
+        border-radius: 12px;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto 10px;
+        position: relative;
+      }
+
+      .spinner::before {
+        content: '';
+        box-sizing: border-box;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        margin-top: -20px;
+        margin-left: -20px;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #ffffff;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      
+      .loading > div:last-child {
+        font-size: 14px;
+        color: #ffffff;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* 提示弹窗 */
+      .tip-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+      }
+
+      .tip-content {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        max-width: 320px;
+        width: 100%;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .tip-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #3d3d3d;
+        margin-bottom: 16px;
+        text-align: left;
+      }
+
+      .tip-text {
+        font-size: 14px;
+        color: #666666;
+        line-height: 22px;
+        margin-bottom: 16px;
+        white-space: pre-line; /* 保留接口返回的换行符 */
+      }
+
+      .tip-btn {
+        width: 100%;
+        background: #e30055;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .tip-btn-text {
+        color: #ffffff;
+        font-size: 16px;
+      }
+
+      /* 已截单弹窗（独立样式） */
+      .closed-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+      }
+
+      .closed-content {
+        width: 343px;
+        border-radius: 8px;
+        padding: 24px;
+        background-color: #ffffff;
+      }
+
+      .closed-title {
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 22px;
+        color: #3d3d3d;
+        margin-bottom: 16px;
+        text-align: left;
+      }
+
+      .closed-text {
+        font-size: 14px;
+        color: #666666;
+        line-height: 20px;
+        margin-bottom: 16px;
+        text-align: left;
+        /* white-space: pre-line; */
+      }
+
+      .closed-btn {
+        width: 100%;
+        background: #e30055;
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+      }
+
+      .closed-btn-text {
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 26px;
+      }
+
+      /* 分享弹框（备用方案） */
+      .share-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 10000;
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+      }
+
+      .share-modal.show {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .share-content {
+        width: 100%;
+        background: transparent;
+        animation: slideUp 0.3s ease;
+        padding: 0 8px 8px 8px;
+        padding-bottom: calc(8px + var(--safe-area-bottom));
+      }
+
+      .share-item {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 16px;
+        text-align: center;
+        transition: background 0.2s;
+        font-size: 20px;
+        color: #007aff;
+        font-weight: 400;
+      }
+
+      .share-item:first-child {
+        border-radius: 13px 13px 0 0;
+      }
+
+      .share-item:active {
+        background: rgba(240, 240, 240, 0.95);
+      }
+
+      .share-divider {
+        height: 8px;
+        background: transparent;
+      }
+
+      .cancel-item {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 13px;
+        font-weight: 600;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <div>加载中...</div>
+    </div>
+
+    <!-- 导航栏 -->
+    <div class="navbar">
+      <div class="navbar-content">
+        <div class="nav-left">
+          <img
+            src="./images/common/backB.png"
+            class="back-icon"
+            onclick="goBack()"
+            alt="返回"
+          />
+          <span class="nav-title">拼团详情</span>
+        </div>
+        <img
+          src="./images/group/share.png"
+          class="share-icon"
+          onclick="shareGroup()"
+          alt="分享"
+        />
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main-container">
+      <!-- 地图 -->
+      <div id="map"></div>
+
+      <!-- 内容区 -->
+      <div class="content-container">
+        <!-- 团基本信息 + 发货信息 -->
+        <div class="section-card">
+          <div class="group-info" id="groupInfo">
+            <!-- JS 动态填充 -->
+          </div>
+
+          <div class="shipping-info" id="shippingInfo">
+            <!-- JS 动态填充 -->
+          </div>
+        </div>
+
+        <!-- 历史发货记录 -->
+        <div class="history-section" id="historySection">
+          <div class="section-title">历史发货记录</div>
+          <!-- JS 动态填充 -->
+        </div>
+
+        <!-- 拼团公告 -->
+        <div class="announcement-section" id="announcementSection">
+          <div class="section-title">拼团公告栏</div>
+          <!-- JS 动态填充 -->
+        </div>
+
+        <!-- 用户评价 -->
+        <div class="review-section" id="reviewSection">
+          <!-- JS 动态填充 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="bottom-actions">
+      <div class="action-left" id="collectBtn" onclick="toggleCollect()">
+        <img
+          id="collectIcon"
+          src="./images/common/noCollect.png"
+          class="collect-icon"
+          alt=""
+        />
+        <span class="collect-text" id="collectText">关注</span>
+      </div>
+      <div class="join-btn" id="joinBtn" onclick="joinGroup()">
+        <span class="join-text" id="joinText">立即跟团</span>
+      </div>
+    </div>
+
+    <!-- 分享弹框（备用方案） -->
+    <div class="share-modal" id="shareModal" onclick="closeShareModal(event)">
+      <div class="share-content" onclick="event.stopPropagation()">
+        <div class="share-item" onclick="handleShareToWeChat()">分享到微信</div>
+        <div class="share-item" onclick="handleCopyLink()">复制链接</div>
+        <div class="share-divider"></div>
+        <div class="share-item cancel-item" onclick="closeShareModal()">
+          取消
+        </div>
+      </div>
+    </div>
+
+    <!-- UniApp WebView通信JS -->
+    <script src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js"></script>
+
+    <script>
+      let map
+      let groupData = null
+      let groupId = ''
+
+      // 从URL参数获取值
+      function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search)
+        return urlParams.get(name)
+      }
+
+      // 获取状态栏高度
+      function getStatusBarHeight() {
+        const urlHeight = getUrlParameter('statusBarHeight')
+        if (urlHeight) {
+          const height = parseInt(urlHeight)
+          if (!isNaN(height)) return height
+        }
+        return 20
+      }
+
+      // 初始化状态栏高度
+      const statusBarHeight = getStatusBarHeight()
+      document.documentElement.style.setProperty(
+        '--status-bar-height',
+        `${statusBarHeight}px`,
+      )
+
+      // 消息队列，用于存储需要发送的消息（每次发送后会清空，避免重复执行历史操作）
+      let messageQueue = []
+
+      // 向UniApp发送消息
+      function sendMessageToApp(data) {
+        try {
+          // 添加到消息队列
+          messageQueue.push(data)
+
+          // 立即尝试发送
+          if (window.uni && window.uni.postMessage) {
+            // 发送当前队列快照
+            const payload = messageQueue.slice()
+            window.uni.postMessage({ data: payload })
+            // ✅ 发送成功后立刻清空队列，避免后续再次发送时重复执行历史消息
+            messageQueue = []
+          }
+        } catch (error) {}
+      }
+
+      // 返回
+      function goBack() {
+        // 统一交给外层uni-app页面处理返回逻辑，避免重复navigateBack导致首页触发“再按一次退出应用”
+        sendMessageToApp({ type: 'goBack' })
+      }
+
+      // 分享
+      function shareGroup() {
+        sendMessageToApp({ type: 'share', groupId })
+      }
+
+      // 显示分享弹框
+      function showShareModal() {
+        const modal = document.getElementById('shareModal')
+        if (modal) {
+          modal.classList.add('show')
+        } else {
+        }
+      }
+
+      // 关闭分享弹框
+      function closeShareModal(event) {
+        const modal = document.getElementById('shareModal')
+        if (modal) {
+          modal.classList.remove('show')
+        }
+      }
+
+      // 分享到微信（HTML内实现）
+      function handleShareToWeChat() {
+        closeShareModal()
+
+        // 通过postMessage通知Vue层执行分享
+        // 因为web-view中的window.uni.share不可用，需要让外层Vue调用
+        sendMessageToApp({
+          type: 'shareToWeChat',
+          groupId: groupId,
+          shareData: {
+            url: `https://h5.pindo.info?id=${groupId}`,
+            title: groupData?.shareInfo?.title || '海运拼团',
+            desc: groupData?.shareInfo?.destination || '',
+            image:
+              'https://api.pindo.info/storage/default/20260109/thumbnail(1)fc7faef2bd96a197060de172793d580d7fbb233f.png',
+          },
+        })
+      }
+
+      // 复制链接（HTML内实现）
+      function handleCopyLink() {
+        closeShareModal()
+        const link = `https://h5.pindo.info?id=${groupId}`
+
+        // 尝试使用现代API复制
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard
+            .writeText(link)
+            .then(() => {
+              showToast('链接已复制')
+            })
+            .catch(() => {
+              fallbackCopyLink(link)
+            })
+        } else {
+          fallbackCopyLink(link)
+        }
+      }
+
+      // 备用复制方法
+      function fallbackCopyLink(text) {
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.select()
+        try {
+          document.execCommand('copy')
+          showToast('链接已复制')
+        } catch (err) {
+          alert('复制失败，请手动复制: ' + text)
+        }
+        document.body.removeChild(textarea)
+      }
+
+      // 显示简单提示
+      function showToast(message) {
+        const toast = document.createElement('div')
+        toast.style.cssText = `
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: rgba(0, 0, 0, 0.7);
+				color: white;
+				padding: 12px 24px;
+				border-radius: 8px;
+				z-index: 10001;
+				font-size: 14px;
+			`
+        toast.textContent = message
+        document.body.appendChild(toast)
+        setTimeout(() => {
+          document.body.removeChild(toast)
+        }, 2000)
+      }
+
+      // 关注切换
+      function toggleCollect() {
+        sendMessageToApp({ type: 'toggleCollect', groupId })
+      }
+
+      // 立即跟团
+      function joinGroup() {
+        const status = parseInt(groupData?.basic_info?.status) || 0
+
+        // 如果团状态大于2，显示已截单提示弹窗
+        if (status > 2) {
+          showClosedTip()
+          return
+        }
+
+        sendMessageToApp({ type: 'joinGroup', groupId })
+      }
+
+      // 查看全部评价
+      function viewAllReviews() {
+        sendMessageToApp({ type: 'viewAllReviews', groupId })
+      }
+
+      // 页面卸载时发送所有待发送的消息（仅发送一次快照，然后清空）
+      window.addEventListener('beforeunload', function () {
+        if (messageQueue.length > 0 && window.uni && window.uni.postMessage) {
+          const payload = messageQueue.slice()
+          window.uni.postMessage({ data: payload })
+          messageQueue = []
+        }
+      })
+
+      // 显示提示
+      function showTip(type) {
+        let title = ''
+        let content = ''
+
+        // 获取接口返回的提示文本数据
+        const instructionInfo = groupData?.instruction_info || {}
+
+        if (type === 'deadline') {
+          title = '截单时间说明'
+          // 优先使用接口返回的文本，如果没有则使用默认文本
+          content = instructionInfo.deadline_text || ''
+        } else if (type === 'weight') {
+          title = '起运重量说明'
+          // 优先使用接口返回的文本，如果没有则使用默认文本
+          content = instructionInfo.weight_progress_explanation || ''
+        }
+
+        const modal = document.createElement('div')
+        modal.className = 'tip-modal'
+        modal.onclick = function (e) {
+          if (e.target === modal) {
+            document.body.removeChild(modal)
+          }
+        }
+
+        modal.innerHTML = `
+			<div class="tip-content">
+				<div class="tip-title">${title}</div>
+				<div class="tip-text">${content}</div>
+				<div class="tip-btn" onclick="this.parentElement.parentElement.parentElement.removeChild(this.parentElement.parentElement)">
+					<span class="tip-btn-text">我知道了</span>
+				</div>
+			</div>
+		`
+
+        document.body.appendChild(modal)
+      }
+
+      // 显示已截单提示
+      function showClosedTip() {
+        const modal = document.createElement('div')
+        modal.className = 'closed-modal' // 使用独立的样式类
+        modal.onclick = function (e) {
+          if (e.target === modal) {
+            document.body.removeChild(modal)
+          }
+        }
+
+        modal.innerHTML = `
+				<div class="closed-content">
+					<div class="closed-title">拼团已截单</div>
+					<div class="closed-text">
+					<div>该拼团已截单，暂时无法跟团</div>
+					<div style="margin-top: 8px;">请等待下一批次拼团开启后再来～</div>
+				</div>
+					<div class="closed-btn" onclick="this.parentElement.parentElement.parentElement.removeChild(this.parentElement.parentElement)">
+						<span class="closed-btn-text">我已知晓</span>
+					</div>
+				</div>
+			`
+        document.body.appendChild(modal)
+      }
+
+      // 初始化地图
+      function initMap() {
+        const latitude = parseFloat(getUrlParameter('latitude')) || 39.8283
+        const longitude = parseFloat(getUrlParameter('longitude')) || -98.5795
+
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: { lat: latitude, lng: longitude },
+          styles: [
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }],
+            },
+          ],
+          zoomControl: false, // 禁用缩放按钮
+          mapTypeControl: false, // 禁用地图类型控件
+          fullscreenControl: false, // 禁用全屏按钮
+          streetViewControl: false, // 禁用街景控件
+          scaleControl: false, // 禁用比例尺
+          rotateControl: false, // 禁用旋转控件
+          disableDefaultUI: true, // 禁用所有默认UI控件
+          gestureHandling: 'greedy', // 支持单指拖拽
+          // 隐藏键盘快捷键、地图数据、条款等底部信息
+          keyboardShortcuts: false, // 禁用键盘快捷键
+          clickableIcons: false, // 禁用POI点击
+        })
+
+        // 触发地图resize以确保正确渲染（解决WebView中白屏问题）
+        setTimeout(function () {
+          if (map) {
+            google.maps.event.trigger(map, 'resize')
+          }
+        }, 100)
+
+        // 添加标记点
+        if (groupData && groupData.basic_info) {
+          const percentage = groupData.basic_info.progress
+            ? Math.round(groupData.basic_info.progress.percentage)
+            : 0
+          addCustomMarker(latitude, longitude, percentage)
+        }
+
+        sendMessageToApp({ type: 'mapReady' })
+
+        // 监听窗口resize事件，触发地图resize
+        let resizeTimer = null
+        window.addEventListener('resize', function () {
+          if (resizeTimer) clearTimeout(resizeTimer)
+          resizeTimer = setTimeout(function () {
+            if (map) {
+              google.maps.event.trigger(map, 'resize')
+            }
+          }, 100)
+        })
+
+        // 监听设备旋转事件
+        window.addEventListener('orientationchange', function () {
+          setTimeout(function () {
+            if (map) {
+              google.maps.event.trigger(map, 'resize')
+            }
+          }, 300)
+        })
+      }
+
+      // 添加自定义标记点
+      function addCustomMarker(lat, lng, percentage) {
+        class GroupMarker extends google.maps.OverlayView {
+          constructor(position, percent) {
+            super()
+            this.position = position
+            this.percent = percent
+          }
+
+          onAdd() {
+            const div = document.createElement('div')
+            div.style.position = 'absolute'
+            div.style.width = '30px'
+            div.style.height = '30px'
+            // div.style.cursor = 'pointer';
+            div.style.transform = 'translate(-50%, -50%)'
+
+            const circle = document.createElement('div')
+            circle.style.width = '30px'
+            circle.style.height = '30px'
+            circle.style.borderRadius = '50%'
+            circle.style.background =
+              'linear-gradient(180deg, #FC7594 0%, #CB1D45 100%)'
+            circle.style.border = '3px solid #FFFFFF'
+            circle.style.boxShadow = '0 0 8px rgba(0,0,0,0.15)'
+            circle.style.display = 'flex'
+            circle.style.alignItems = 'center'
+            circle.style.justifyContent = 'center'
+            circle.style.color = '#FFFFFF'
+            circle.style.fontSize = '10px'
+            circle.style.fontWeight = '400'
+            circle.textContent = this.percent + '%'
+
+            div.appendChild(circle)
+            this.div = div
+            this.getPanes().markerLayer.appendChild(div)
+          }
+
+          draw() {
+            const projection = this.getProjection()
+            const position = projection.fromLatLngToDivPixel(this.position)
+            this.div.style.left = position.x + 'px'
+            this.div.style.top = position.y + 'px'
+          }
+
+          onRemove() {
+            if (this.div && this.div.parentElement) {
+              this.div.parentElement.removeChild(this.div)
+            }
+          }
+        }
+
+        const marker = new GroupMarker(
+          new google.maps.LatLng(lat, lng),
+          percentage,
+        )
+        marker.setMap(map)
+      }
+
+      // 加载Google Maps API
+      function loadGoogleMapsAPI() {
+        const apiKey =
+          getUrlParameter('key') || 'AIzaSyBB9uJEdEC_Xug4IjPdI-MKLh9QNOrx9DA'
+        const script = document.createElement('script')
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`
+        script.async = true
+        script.defer = true
+        script.onerror = function () {
+          document.getElementById('loading').innerHTML = `
+					<div style="color: red; text-align: center;">
+						<div>地图加载失败</div>
+						<div style="font-size: 12px; margin-top: 10px;">请检查网络连接</div>
+					</div>
+				`
+        }
+        document.head.appendChild(script)
+      }
+
+      // 渲染页面内容
+      function renderPage() {
+        const dataParam = getUrlParameter('data')
+        if (!dataParam) {
+          document.getElementById('loading').innerHTML =
+            '<div>数据加载失败</div>'
+          return
+        }
+
+        try {
+          groupData = JSON.parse(decodeURIComponent(dataParam))
+          groupId = groupData.basic_info?.id || ''
+
+          // 渲染团基本信息
+          renderGroupInfo()
+          // 渲染发货信息
+          renderShippingInfo()
+          // 渲染历史记录
+          renderHistory()
+          // 渲染公告
+          renderAnnouncement()
+          // 渲染评价
+          renderReviews()
+          // 更新关注状态
+          updateCollectStatus()
+          // 更新跟团按钮状态
+          updateJoinButtonStatus()
+
+          // 加载地图
+          loadGoogleMapsAPI()
+
+          // 隐藏loading
+          document.getElementById('loading').classList.add('hidden')
+        } catch (error) {
+          document.getElementById('loading').innerHTML =
+            '<div>数据解析失败</div>'
+        }
+      }
+
+      // 渲染团基本信息
+      function renderGroupInfo() {
+        const basic = groupData.basic_info
+        if (!basic) return
+
+        const html = `
+				<div class="group-title">${basic.group_name || ''}</div>
+				<div class="group-meta">
+					<div class="meta-item">
+						<img src="./images/index/locateH.png" class="meta-icon" alt="">
+						<span>${basic.distance || ''}</span>
+					</div>
+					<span class="meta-divider">•</span>
+					<span>${basic.company_name || ''}</span>
+					<span class="meta-divider">•</span>
+					<span>${basic.transport_type_text || ''}${basic.cargo_type_text || ''}</span>
+				</div>
+				<div class="price-info">
+					<span class="price-symbol">¥</span>
+					<span class="price-value">${basic.amount || 0}</span>
+					<span class="price-unit">/kg</span>
+				</div>
+			`
+        document.getElementById('groupInfo').innerHTML = html
+      }
+
+      // 渲染发货信息
+      function renderShippingInfo() {
+        const basic = groupData.basic_info
+        if (!basic) return
+
+        const progress = basic.progress || {}
+        const users = basic.group_users || {}
+        const recentUsers = users.recent_users || []
+
+        const avatarsHtml = recentUsers
+          .map(
+            (user) => `<img src="${user.avatar}" class="member-avatar" alt="">`,
+          )
+          .join('')
+
+        const html = `
+				<div class="shipping-row">
+					<div class="shipping-label">
+						<span>截单时间 (北京时间)</span>
+						<img src="./images/common/ti.png" class="info-icon" onclick="showTip('deadline')" alt="">
+					</div>
+					<span class="shipping-value">${basic.countdown_days || 0}</span>
+				</div>
+				<div class="shipping-date">${basic.estimated_ship_date || ''}</div>
+				<div class="progress-container">
+					<div class="progress-bar">
+						<div class="progress-fill" style="width: ${progress.percentage || 0}%"></div>
+					</div>
+					<div class="progress-info">
+						<span class="progress-current">${progress.current_weight || 0}kg</span>
+						<span class="progress-sep">/</span>
+						<span class="progress-total">${progress.min_weight || 0}kg</span>
+						<img src="./images/common/ti.png" class="info-icon" onclick="showTip('weight')" alt="">
+					</div>
+				</div>
+				<div class="members-info">
+					<div class="member-avatars">${avatarsHtml}</div>
+					<span class="member-count">
+						<span class="cB">${users.total_count || 0}</span>人已跟团
+					</span>
+				</div>
+			`
+        document.getElementById('shippingInfo').innerHTML = html
+      }
+
+      // 渲染历史发货记录
+      function renderHistory() {
+        const shipping = groupData.shipping_info || {}
+        const html = `
+				<div class="history-item">
+					<span class="history-label">平均发货周期</span>
+					<span class="history-value cB">${shipping.average_shipping_cycle || 0}天</span>
+				</div>
+				<div class="history-item">
+					<span class="history-label">上次发货时间</span>
+					<span class="history-value">${shipping.last_shipping_time || '-'}</span>
+				</div>
+				<div class="history-item">
+					<span class="history-label">上次发货地址</span>
+					<span class="history-value">${shipping.last_shipping_address || '-'}</span>
+				</div>
+			`
+        document.getElementById('historySection').innerHTML += html
+      }
+
+      /**
+       * 渲染拼团公告栏
+       * 接口返回格式：announcement_info 是数组 [{name, value}, ...]
+       * - name为空时：作为主公告内容，不显示label
+       * - name有值时：显示"label: value"格式
+       */
+      function renderAnnouncement() {
+        const announcementList = groupData.announcement_info || []
+        const formatAnnouncement = (value) => {
+          if (value === null || value === undefined) return ''
+          return String(value).replace(/\r\n|\n|\r/g, '<br>')
+        }
+
+        // 检查是否是数组
+        if (!Array.isArray(announcementList)) {
+          // 数据格式异常时跳过渲染
+          return
+        }
+
+        // 如果没有公告数据，隐藏整个区块
+        if (announcementList.length === 0) {
+          const section = document.getElementById('announcementSection')
+          if (section) {
+            section.style.display = 'none'
+          }
+          return
+        }
+
+        // 渲染公告列表
+        const html = announcementList
+          .map((item) => {
+            // 如果name为空，只显示value作为主公告内容
+            if (!item.name || item.name.trim() === '') {
+              return `
+						<div class="announcement-item">
+							<span class="announcement-content" style="margin-top: 0;">${formatAnnouncement(item.value)}</span>
+						</div>
+					`
+            }
+            // 如果name有值，显示"label: value"格式
+            return `
+					<div class="announcement-item">
+						<span class="announcement-label">${item.name}</span>
+						<span class="announcement-content">${formatAnnouncement(item.value)}</span>
+					</div>
+				`
+          })
+          .join('')
+
+        const announcementSection = document.getElementById(
+          'announcementSection',
+        )
+        if (announcementSection) {
+          // 保留section的标题，只更新内容部分
+          const titleHtml = '<div class="section-title">拼团公告栏</div>'
+          announcementSection.innerHTML = titleHtml + html
+        }
+      }
+
+      // 渲染用户评价
+      function renderReviews() {
+        const reviews = groupData.reviews || { total: 0, list: [] }
+        const reviewSection = document.getElementById('reviewSection')
+
+        // 如果没有评价数据，显示空状态
+        if (
+          !reviews.total ||
+          reviews.total === 0 ||
+          !reviews.list ||
+          reviews.list.length === 0
+        ) {
+          const html = `
+					<div class="review-section-header">
+						<div class="review-title-wrapper">
+							<span class="review-section-title">用户评价</span>
+							<span class="review-count">(0)</span>
+						</div>
+					</div>
+					<div style="text-align: center; padding: 20px 0; color: #999999; font-size: 14px;">
+						暂无评价
+					</div>
+				`
+          if (reviewSection) {
+            reviewSection.innerHTML = html
+          }
+          return
+        }
+
+        const reviewList = reviews.list.slice(0, 2)
+
+        const reviewsHtml = reviewList
+          .map((review) => {
+            const imagesHtml = (review.images || [])
+              .map((img) => `<img src="${img}" class="review-image" alt="">`)
+              .join('')
+
+            // 根据实际评分显示5颗星：满星用图标，空星用字符
+            const transportRating = parseInt(review.transport_rating) || 0
+            const transportStars = Array(5)
+              .fill(0)
+              .map((_, index) => {
+                if (index < transportRating) {
+                  return `<img src="./images/group/star.png" class="review-star filled" alt="">`
+                } else {
+                  return `<img src="./images/group/starNo.png" class="review-star filled" alt="">`
+                }
+              })
+              .join('')
+
+            const groupRating = parseInt(review.group_rating) || 0
+            const groupStars = Array(5)
+              .fill(0)
+              .map((_, index) => {
+                if (index < groupRating) {
+                  return `<img src="./images/group/star.png" class="review-star filled" alt="">`
+                } else {
+                  return `<img src="./images/group/starNo.png" class="review-star filled" alt="">`
+                }
+              })
+              .join('')
+
+            return `
+					<div class="review-item">
+						<img src="${review.user_avatar}" class="review-avatar" alt="">
+						<div class="review-content-wrapper">
+							<div class="review-header">
+								<span class="review-name">${review.user_nickname}</span>
+								<span class="review-time">${review.created_time}</span>
+							</div>
+							<div class="review-rating-row">
+								<div class="review-stars">${transportStars}</div>
+								<span class="review-rating-text">${review.transport_rating}.0分</span>
+								<span class="review-rating-label">转运公司</span>
+							</div>
+							<div class="review-rating-row review-rating-row-group">
+								<div class="review-stars">${groupStars}</div>
+								<span class="review-rating-text">${review.group_rating}.0分</span>
+								<span class="review-rating-label">拼团评价</span>
+							</div>
+							${imagesHtml ? `<div class="review-images">${imagesHtml}</div>` : ''}
+							<div class="review-content">${review.content}</div>
+						</div>
+					</div>
+				`
+          })
+          .join('')
+
+        const html = `
+				<div class="review-section-header">
+					<div class="review-title-wrapper">
+						<span class="review-section-title">用户评价</span>
+						<span class="review-count">(${reviews.total})</span>
+					</div>
+					<div class="review-view-all" onclick="viewAllReviews()">
+						<span>查看全部</span>
+						<img src="./images/common/arrwR.png" class="review-arrow-icon" alt="">
+					</div>
+				</div>
+				${reviewsHtml}
+			`
+        if (reviewSection) {
+          reviewSection.innerHTML = html
+        }
+      }
+
+      // 更新关注状态
+      function updateCollectStatus() {
+        const isFollowed = groupData.basic_info?.is_followed || false
+        document.getElementById('collectIcon').src = isFollowed
+          ? './images/common/collect.png'
+          : './images/common/noCollect.png'
+        document.getElementById('collectText').textContent = isFollowed
+          ? '关注'
+          : '关注'
+      }
+
+      // 更新跟团按钮状态
+      function updateJoinButtonStatus() {
+        const step = groupData.group_step || 0
+        const status = parseInt(groupData?.basic_info?.status) || 0
+        const btn = document.getElementById('joinBtn')
+        const text = document.getElementById('joinText')
+
+        // 优先检查团状态是否大于2（已截单）
+        if (status > 2) {
+          btn.classList.remove('disabled')
+          btn.classList.add('closed')
+          text.textContent = '已截单'
+        } else if (step === 5) {
+          // btn.classList.add('disabled');
+          btn.classList.remove('closed')
+          text.textContent = '查看我的拼团'
+        } else {
+          btn.classList.remove('disabled')
+          btn.classList.remove('closed')
+          text.textContent = '立即跟团'
+        }
+      }
+
+      // 处理来自App的消息
+      window.addEventListener('message', function (event) {
+        // uni-app web-view 消息格式：event.data.data
+        let data = event.data
+
+        // 如果是uni-app格式，提取实际数据
+        if (data && data.data) {
+          data = data.data
+        }
+
+        // 如果是字符串，尝试解析
+        if (typeof data === 'string') {
+          try {
+            data = JSON.parse(data)
+          } catch (e) {
+            return
+          }
+        }
+
+        if (!data || !data.type) return
+
+        switch (data.type) {
+          case 'updateCollectStatus':
+            if (groupData && groupData.basic_info) {
+              groupData.basic_info.is_followed = data.isFollowed
+              updateCollectStatus()
+            }
+            break
+        }
+      })
+
+      // 页面加载
+      window.onload = function () {
+        renderPage()
+      }
+    </script>
+  </body>
+</html>

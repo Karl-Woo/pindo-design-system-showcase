@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>拼团位置</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #f2f2f2; }
+      #map { width: 100%; height: 100%; }
+
+      /* ── 加载态（对齐地图找团页的 loading，用 DS token 配色）── */
+      #spinner {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: #f5f5f5; /* surface-secondary / grey-50 */ z-index: 5;
+      }
+      #spinner .box {
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+      }
+      #spinner .ring {
+        width: 30px; height: 30px;
+        border: 2px solid #ededed;        /* grey-100 */
+        border-top-color: #cb1d45;        /* brand-500 */
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      #spinner .tip {
+        font-size: 14px; color: #616161;  /* text-tertiary (body-sm) */
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      /* ── 悬浮圆形按钮（对齐拼团详情页地图上的白色气泡）── */
+      .fab {
+        position: fixed; z-index: 10;
+        width: 44px; height: 44px; border-radius: 50%;
+        background: #ffffff;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.16);
+        display: flex; align-items: center; justify-content: center;
+        -webkit-tap-highlight-color: transparent; cursor: pointer;
+      }
+      .fab:active { opacity: 0.85; }
+      .fab svg { width: 22px; height: 22px; display: block; pointer-events: none; }
+      .fab--back { left: 16px; }
+      .fab--recenter { right: 16px; }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="spinner">
+      <div class="box">
+        <div class="ring"></div>
+        <div class="tip" id="loadingTip">正在加载地图…</div>
+      </div>
+    </div>
+
+    <!-- 悬浮气泡：返回（左）/ 回到拼团位置（右）。图标 = 设计系统 MDI（arrow-left /
+         crosshairs-gps，与 pd-icon 同源），内联 SVG。top 由 statusBarHeight 动态设置。 -->
+    <div class="fab fab--back" id="fabBack" onclick="goBack()">
+      <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/></svg>
+    </div>
+    <div class="fab fab--recenter" id="fabRecenter" onclick="recenterMap()">
+      <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M3.05,13H1V11H3.05C3.5,6.83 6.83,3.5 11,3.05V1H13V3.05C17.17,3.5 20.5,6.83 20.95,11H23V13H20.95C20.5,17.17 17.17,20.5 13,20.95V23H11V20.95C6.83,20.5 3.5,17.17 3.05,13M12,5A7,7 0 0,0 5,12A7,7 0 0,0 12,19A7,7 0 0,0 19,12A7,7 0 0,0 12,5Z"/></svg>
+    </div>
+
+    <script src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js"></script>
+    <script>
+      var map = null
+      var groupLat = 39.8283
+      var groupLng = -98.5795
+
+      function getUrlParameter(name) {
+        return new URLSearchParams(window.location.search).get(name)
+      }
+
+      // 悬浮气泡按状态栏高度下移，避开刘海 / 状态栏（对齐 App 顶部安全区）。
+      function positionFabs() {
+        var sb = parseFloat(getUrlParameter('statusBarHeight')) || 20
+        var top = sb + 12 + 'px'
+        document.getElementById('fabBack').style.top = top
+        document.getElementById('fabRecenter').style.top = top
+      }
+
+      // HTML → uni 通信（与地图找团页 googleMap.html 同款、已验证可靠的通道）。
+      function sendMessageToApp(data) {
+        try {
+          if (window.uni && typeof window.uni.postMessage === 'function') {
+            window.uni.postMessage({ data })
+            return
+          }
+          if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.postMessage) {
+            window.webkit.messageHandlers.postMessage.postMessage(JSON.stringify(data))
+            return
+          }
+          if (window.postMessage) window.postMessage(JSON.stringify(data))
+        } catch (e) {}
+      }
+
+      // 返回：交给外层 uni 页面处理（走 backToGroupDetail 的确定性返回）。
+      function goBack() {
+        sendMessageToApp({ type: 'goBack' })
+      }
+
+      // 回到拼团坐标（重新居中）。
+      function recenterMap() {
+        if (!map) return
+        map.panTo({ lat: groupLat, lng: groupLng })
+        map.setZoom(15)
+      }
+
+      // 单点品牌 pin：白边圆形 + 品牌渐变 + 百分比（与拼团详情页卡片上的 pin 同款，放大）。
+      function addGroupMarker(lat, lng, percent) {
+        function GroupMarker(position, pct) {
+          this.position = position
+          this.pct = pct
+        }
+        GroupMarker.prototype = new google.maps.OverlayView()
+        GroupMarker.prototype.onAdd = function () {
+          var div = document.createElement('div')
+          div.style.position = 'absolute'
+          div.style.transform = 'translate(-50%, -50%)'
+          var circle = document.createElement('div')
+          circle.style.width = '46px'
+          circle.style.height = '46px'
+          circle.style.borderRadius = '50%'
+          circle.style.background = 'linear-gradient(180deg, #FC7594 0%, #CB1D45 100%)'
+          circle.style.border = '4px solid #FFFFFF'
+          circle.style.boxShadow = '0 0 10px rgba(0,0,0,0.18)'
+          circle.style.display = 'flex'
+          circle.style.alignItems = 'center'
+          circle.style.justifyContent = 'center'
+          circle.style.color = '#FFFFFF'
+          circle.style.fontSize = '13px'
+          circle.style.fontWeight = '600'
+          circle.textContent = (percent || 0) + '%'
+          div.appendChild(circle)
+          this.div = div
+          this.getPanes().overlayMouseTarget.appendChild(div)
+        }
+        GroupMarker.prototype.draw = function () {
+          var p = this.getProjection().fromLatLngToDivPixel(this.position)
+          if (this.div) { this.div.style.left = p.x + 'px'; this.div.style.top = p.y + 'px' }
+        }
+        var m = new GroupMarker(new google.maps.LatLng(lat, lng), percent)
+        m.setMap(map)
+      }
+
+      // Google Maps 回调
+      function initMap() {
+        groupLat = parseFloat(getUrlParameter('lat'))
+        groupLng = parseFloat(getUrlParameter('lng'))
+        if (isNaN(groupLat) || isNaN(groupLng)) { groupLat = 39.8283; groupLng = -98.5795 }
+        var pct = parseInt(getUrlParameter('pct'), 10) || 0
+
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: { lat: groupLat, lng: groupLng },
+          styles: [{ featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }],
+          disableDefaultUI: true,
+          gestureHandling: 'greedy',
+          keyboardShortcuts: false,
+          clickableIcons: false,
+        })
+
+        google.maps.event.addListenerOnce(map, 'idle', function () {
+          var s = document.getElementById('spinner')
+          if (s) s.style.display = 'none'
+        })
+        // WebView 里偶发白屏 → 触发一次 resize
+        setTimeout(function () { if (map) google.maps.event.trigger(map, 'resize') }, 120)
+
+        addGroupMarker(groupLat, groupLng, pct)
+      }
+
+      function loadGoogleMapsAPI() {
+        var apiKey = getUrlParameter('key') || 'AIzaSyBB9uJEdEC_Xug4IjPdI-MKLh9QNOrx9DA'
+        var s = document.createElement('script')
+        s.src = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&callback=initMap'
+        s.async = true
+        s.defer = true
+        s.onerror = function () {
+          var ring = document.querySelector('#spinner .ring')
+          if (ring) { ring.style.animation = 'none'; ring.style.borderTopColor = '#8b8b8b' }
+          var tip = document.getElementById('loadingTip')
+          if (tip) tip.textContent = '地图加载失败，请检查网络'
+        }
+        document.head.appendChild(s)
+      }
+
+      positionFabs()
+      loadGoogleMapsAPI()
+    </script>
+  </body>
+</html>

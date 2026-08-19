@@ -1,0 +1,38 @@
+{
+  "pages": [
+    { "path": "pages/showcase/index", "style": { "navigationStyle": "custom", "navigationBarTitleText": "Pindo Coral 设计系统" } },
+    { "path": "pages/showcase/colors", "style": { "navigationStyle": "custom", "navigationBarTitleText": "颜色" } },
+    { "path": "pages/showcase/typography", "style": { "navigationStyle": "custom", "navigationBarTitleText": "字体排印" } },
+    { "path": "pages/showcase/spacing", "style": { "navigationStyle": "custom", "navigationBarTitleText": "间距" } },
+    { "path": "pages/showcase/elevation", "style": { "navigationStyle": "custom", "navigationBarTitleText": "层级阴影" } },
+    { "path": "pages/showcase/motion", "style": { "navigationStyle": "custom", "navigationBarTitleText": "动效" } },
+    { "path": "pages/showcase/icons", "style": { "navigationStyle": "custom", "navigationBarTitleText": "图标" } },
+    { "path": "pages/showcase/button", "style": { "navigationStyle": "custom", "navigationBarTitleText": "按钮" } },
+    { "path": "pages/showcase/input", "style": { "navigationStyle": "custom", "navigationBarTitleText": "输入框" } },
+    { "path": "pages/showcase/card", "style": { "navigationStyle": "custom", "navigationBarTitleText": "卡片" } },
+    { "path": "pages/showcase/group-card", "style": { "navigationStyle": "custom", "navigationBarTitleText": "拼团卡片" } },
+    { "path": "pages/showcase/list", "style": { "navigationStyle": "custom", "navigationBarTitleText": "列表项" } },
+    { "path": "pages/showcase/badge", "style": { "navigationStyle": "custom", "navigationBarTitleText": "徽章" } },
+    { "path": "pages/showcase/popup", "style": { "navigationStyle": "custom", "navigationBarTitleText": "弹出层" } },
+    { "path": "pages/showcase/feedback", "style": { "navigationStyle": "custom", "navigationBarTitleText": "反馈提示" } },
+    { "path": "pages/showcase/navbar-page", "style": { "navigationStyle": "custom", "navigationBarTitleText": "导航栏" } },
+    { "path": "pages/showcase/tabs", "style": { "navigationStyle": "custom", "navigationBarTitleText": "标签页" } },
+    { "path": "pages/showcase/skeleton", "style": { "navigationStyle": "custom", "navigationBarTitleText": "骨架屏" } },
+    { "path": "pages/showcase/steps", "style": { "navigationStyle": "custom", "navigationBarTitleText": "步骤条" } },
+    { "path": "pages/showcase/upload", "style": { "navigationStyle": "custom", "navigationBarTitleText": "上传" } },
+    { "path": "pages/showcase/dot-slider", "style": { "navigationStyle": "custom", "navigationBarTitleText": "档位滑块" } },
+    { "path": "pages/showcase/progress", "style": { "navigationStyle": "custom", "navigationBarTitleText": "进度条" } },
+    { "path": "pages/showcase/rate", "style": { "navigationStyle": "custom", "navigationBarTitleText": "评分" } },
+    { "path": "pages/showcase/avatar", "style": { "navigationStyle": "custom", "navigationBarTitleText": "头像" } },
+    { "path": "pages/showcase/page-layout", "style": { "navigationStyle": "custom", "navigationBarTitleText": "页面布局" } },
+    { "path": "pages/showcase/forms", "style": { "navigationStyle": "custom", "navigationBarTitleText": "表单模式" } },
+    { "path": "pages/showcase/states", "style": { "navigationStyle": "custom", "navigationBarTitleText": "交互状态" } },
+    { "path": "pages/showcase/review-card", "style": { "navigationStyle": "custom", "navigationBarTitleText": "评价卡" } }
+  ],
+  "globalStyle": {
+    "navigationStyle": "custom",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Pindo Coral Design System",
+    "navigationBarBackgroundColor": "#FFFFFF"
+  }
+}

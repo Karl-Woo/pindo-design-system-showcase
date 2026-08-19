@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') ||
+        CSS.supports('top: constant(a)'))
+      document.write(
+        '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' +
+        (coverSupport ? ', viewport-fit=cover' : '') + '" />')
+    </script>
+    <title>Pindo Coral Design System</title>
+    <meta name="description" content="Pindo Coral Design System — 海运拼团 App 的设计语言、组件库与模式参考。" />
+    <meta name="theme-color" content="#CB1D45" />
+    <link rel="icon" type="image/svg+xml" href="./static/images/logo.svg" />
+    <!-- iOS Safari doesn't support SVG for apple-touch-icon, keep PNG for that. -->
+    <link rel="apple-touch-icon" href="./static/images/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!--preload-links-->
+    <!--app-context-->
+  </head>
+  <body>
+    <div id="app"><!--app-html--></div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

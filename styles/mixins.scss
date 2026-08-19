@@ -1,0 +1,196 @@
+// ============================================================================
+// Pindo Design System — Mixins
+// ============================================================================
+@import './tokens';
+
+// ── Typography ──
+// Usage: @include pd-type(body-lg);  @include pd-type(heading-1);
+
+// 品牌高亮字体（阿里妈妈数黑体）—— 与 pd-type 平行叠加：
+//   字号继续由 pd-type($level) 决定，pd-font-display-brand 只换字体 + 字重。
+//   Usage: .hero-cta { @include pd-type(display-lg); @include pd-font-display-brand; }
+//   详见 doc/DESIGN_SYSTEM.md §2.5。
+@mixin pd-font-display-brand {
+  font-family: $pd-font-family-display-brand;
+  font-weight: $pd-font-bold;
+}
+
+// 品牌高亮字体在 body-lg (32rpx) 字号上的成品 label 样式。
+// 仅用于 1–4 字短品牌标签（徽章、状态丸、内联 tag）。其他 body 文字请走系统字。
+//   Usage: .badge { @include pd-display-brand-label; }
+//   详见 doc/DESIGN_SYSTEM.md §2.5。
+@mixin pd-display-brand-label {
+  @include pd-type(body-lg);
+  @include pd-font-display-brand;
+}
+
+@mixin pd-type($level) {
+  @if $level == display-lg {
+    font-size: $pd-display-lg;
+    font-weight: $pd-font-bold;
+    line-height: $pd-display-lg-lh;
+    letter-spacing: $pd-display-lg-ls;
+  } @else if $level == display-md {
+    font-size: $pd-display-md;
+    font-weight: $pd-font-bold;
+    line-height: $pd-display-md-lh;
+    letter-spacing: $pd-display-md-ls;
+  } @else if $level == heading-1 {
+    font-size: $pd-heading-1;
+    font-weight: $pd-font-bold;
+    line-height: $pd-heading-1-lh;
+    letter-spacing: $pd-heading-1-ls;
+  } @else if $level == heading-2 {
+    font-size: $pd-heading-2;
+    font-weight: $pd-font-semibold;
+    line-height: $pd-heading-2-lh;
+    letter-spacing: $pd-heading-2-ls;
+  } @else if $level == heading-3 {
+    font-size: $pd-heading-3;
+    font-weight: $pd-font-semibold;
+    line-height: $pd-heading-3-lh;
+    letter-spacing: $pd-heading-3-ls;
+  } @else if $level == heading-4 {
+    font-size: $pd-heading-4;
+    font-weight: $pd-font-semibold;
+    line-height: $pd-heading-4-lh;
+    letter-spacing: $pd-heading-4-ls;
+  } @else if $level == body-lg {
+    font-size: $pd-body-lg;
+    font-weight: $pd-font-regular;
+    line-height: $pd-body-lg-lh;
+    letter-spacing: $pd-body-lg-ls;
+  } @else if $level == body-sm {
+    font-size: $pd-body-sm;
+    font-weight: $pd-font-regular;
+    line-height: $pd-body-sm-lh;
+    letter-spacing: $pd-body-sm-ls;
+  } @else if $level == caption {
+    font-size: $pd-caption;
+    font-weight: $pd-font-regular;
+    line-height: $pd-caption-lh;
+    letter-spacing: $pd-caption-ls;
+  } @else if $level == overline {
+    font-size: $pd-overline;
+    font-weight: $pd-font-medium;
+    line-height: $pd-overline-lh;
+    letter-spacing: $pd-overline-ls;
+  }
+}
+
+// ── Elevation ──
+// Usage: @include pd-elevation(2);
+
+@mixin pd-elevation($level) {
+  @if $level == 0 {
+    box-shadow: $pd-elevation-0;
+  } @else if $level == 1 {
+    box-shadow: $pd-elevation-1;
+  } @else if $level == 2 {
+    box-shadow: $pd-elevation-2;
+  } @else if $level == 3 {
+    box-shadow: $pd-elevation-3;
+  } @else if $level == 4 {
+    box-shadow: $pd-elevation-4;
+  } @else if $level == brand {
+    box-shadow: $pd-elevation-brand;
+  }
+}
+
+// ── Line Clamp (text truncation) ──
+// Usage: @include pd-line-clamp(2);
+
+@mixin pd-line-clamp($lines: 1) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  @if $lines == 1 {
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+  }
+}
+
+// ── Focus Ring (accessibility) ──
+// Usage: @include pd-focus-ring;
+
+@mixin pd-focus-ring {
+  outline: 4rpx solid $pd-brand-500;
+  outline-offset: 4rpx;
+}
+
+// ── Safe Area Bottom ──
+// Usage: @include pd-safe-bottom(32rpx);
+//
+// ADDITIVE: dock padding + device safe-area. Use when the element must keep its
+// own padding AND clear the home indicator on top of it (rare).
+@mixin pd-safe-bottom($extra: 0rpx) {
+  padding-bottom: calc(#{$extra} + env(safe-area-inset-bottom));
+}
+
+// Dock safe-area (sticky bottom button docks) — the bottom inset is the LARGER
+// of the dock's own padding and the device safe-area, NOT their sum. On a
+// notched phone the ~34pt home-indicator inset already clears the dock, so
+// adding the pad on top is dead space (the "gigantic gap" bug). max() floors
+// the gap to the dock padding on non-notched screens and lets the safe-area
+// absorb it on notched ones. See DESIGN_SYSTEM.md "Bottom dock safe-area".
+@mixin pd-safe-bottom-min($pad) {
+  padding-bottom: max(#{$pad}, env(safe-area-inset-bottom));
+}
+
+// ── Flex Shortcuts ──
+
+@mixin pd-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin pd-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin pd-flex-row {
+  display: flex;
+  align-items: center;
+}
+
+@mixin pd-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Transition ──
+// Usage: @include pd-transition(background-color);
+//
+// `all` is permitted for convenience but discouraged (animates every changing
+// property — paint cost + surprise). Prefer enumerating: `background-color,
+// transform`. The `.pd-transition` utility class in animations.scss already
+// covers the common interactive bundle.
+
+@mixin pd-transition($properties: all, $duration: $pd-duration-fast, $easing: $pd-ease-standard) {
+  transition: $properties $duration $easing;
+}
+
+// ── Press Scale ──
+// Universal press-down feedback. Used inside `&--pressed` blocks across
+// pd-button, pd-card, pd-group-card. Scale-down + ease-standard reads as a
+// firm, definitive press; avoid spring easing here (it overshoots, which
+// reads as bouncy and undermines the "you pressed it" feedback).
+//
+// Usage:
+//   .my-comp {
+//     @include pd-transition(transform);
+//     &--pressed { @include pd-press-scale; }
+//   }
+//
+// $factor: scale target. 0.98 for buttons, 0.97 for cards (slightly more
+// noticeable on the larger surface).
+
+@mixin pd-press-scale($factor: 0.98) {
+  transform: scale($factor);
+}

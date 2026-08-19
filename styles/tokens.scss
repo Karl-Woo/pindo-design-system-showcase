@@ -1,0 +1,321 @@
+// ============================================================================
+// Pindo Design System — Tokens
+// Single source of truth. All values from doc/DESIGN_SYSTEM.md
+// Prefix: $pd-  (avoids collision with $uni-* in uni.scss)
+// ============================================================================
+
+// ── Brand ──
+// Solid scale spans tint → shade. Use these on any surface (white or tinted).
+$pd-brand-50-solid:  #FBE6EC; // very light tint, opaque
+$pd-brand-100-solid: #F8D1DA;
+$pd-brand-200-solid: #F1A4B6;
+$pd-brand-300:       #E1768F;
+$pd-brand-400:       #E85A7A;
+$pd-brand-500:       #CB1D45; // base brand
+$pd-brand-600:       #A01636;
+$pd-brand-700:       #7E0F2C;
+$pd-brand-800:       #56091E;
+$pd-brand-900:       #2F0411;
+$pd-brand-cta:       #E30055; // punchier CTA accent — use only for primary
+                              // CTAs that warrant standing out from -500.
+
+// Alpha-based brand tints. Use on WHITE surfaces only — they show through on
+// any tinted background. For tinted-surface usage, prefer the *-solid tokens
+// above. Numeric suffix matches the alpha multiplied by 1000 / fully-opaque
+// scale convention (50 = 8% alpha, 100 = 10%, 150 = 12%, 200 = 20%).
+$pd-brand-50:  rgba(203, 29, 69, 0.08);
+$pd-brand-100: rgba(203, 29, 69, 0.10);
+$pd-brand-150: rgba(203, 29, 69, 0.12);
+$pd-brand-200: rgba(203, 29, 69, 0.20);
+
+// ── Semantic ──
+$pd-success: #34C759;
+$pd-warning: #FF9500;
+$pd-error:   #FF3B30;
+$pd-info:    #007AFF;
+
+// Rating — iOS systemYellow. Extends the iOS-sourced semantic-fills family
+// (green/orange/red/blue + yellow). Star/icon FILL only — yellow on white is
+// ~1.07:1, so never apply to text (a rating score like "4.0分" uses a neutral
+// text token, not this). Empty stars use $pd-border-light.
+$pd-rating:  #FFCC00;
+
+// Text-safe semantic variants. The base $pd-success/warning/error/info colors
+// fail WCAG AA contrast (4.5:1) on white for body text — they're fine for
+// fills, borders, and icons (3:1 threshold) but not for any colored copy.
+// Always use the *-text variant when applying a semantic color to TEXT.
+$pd-success-text: #058132; // ~5.1:1 on white  ✓ AA normal
+$pd-warning-text: #B35100; // ~4.7:1 on white  ✓ AA normal
+$pd-error-text:   #D70015; // ~5.9:1 on white  ✓ AA normal
+$pd-info-text:    #006CE5; // ~5.2:1 on white  ✓ AA normal
+
+// Tinted backgrounds for status badges, rule cards, inline messages, banners.
+// `-bg` is the lighter tint for spacious cards / banners; `-bg-strong` is for
+// compact pills/badges where the background needs more presence.
+$pd-success-bg:        rgba(52,  199, 89,  0.08);
+$pd-warning-bg:        rgba(255, 149, 0,   0.08);
+$pd-error-bg:          rgba(255, 59,  48,  0.08);
+$pd-info-bg:           rgba(0,   122, 255, 0.08);
+$pd-success-bg-strong: rgba(52,  199, 89,  0.12);
+$pd-warning-bg-strong: rgba(255, 149, 0,   0.12);
+$pd-error-bg-strong:   rgba(255, 59,  48,  0.12);
+$pd-info-bg-strong:    rgba(0,   122, 255, 0.12);
+
+// ── Neutral — Grey Scale (10-step backbone) ──
+// Pure neutral (saturation 0%, no hue). Replaced the iOS systemGray hexes —
+// those carried a 240° blue tint that was inconsistent across the scale (grey-100
+// peaked at 17% saturation while grey-700 was 2%) and clashed with the warm
+// coral brand. Coherence > iOS-alignment for a brand-led system. AA contrast
+// ratios verified (slightly improved on text tokens).
+//
+// SOURCE OF TRUTH for every neutral tone — text-* / surface-* / border-* are
+// all aliases. Pick the role-named token, not the hex.
+//
+// Not sure which to use?
+//   - Text:    grey-700 → grey-900 (AA-safe on white)
+//   - Borders: grey-200 → grey-400
+//   - Fills:   grey-50  → grey-100
+$pd-grey-50:  #F5F5F5; // subtle stripe rows / hover on white
+$pd-grey-100: #EDEDED; // card / grouped bg                       (was #F2F2F7)
+$pd-grey-200: #DFDFDF; // dividers, light borders                 (was #E5E5EA)
+$pd-grey-300: #CCCCCC; // input borders                           (was #D1D1D6)
+$pd-grey-400: #C2C2C2; // default borders                         (was #C7C7CC)
+$pd-grey-500: #ABABAB; // disabled UI                             (was #AEAEB2)
+$pd-grey-600: #8B8B8B; // placeholder text (3.5:1)                (was #8E8E93)
+$pd-grey-700: #616161; // caption text (5.3:1 ✓ AA)               (was #636366)
+$pd-grey-800: #3D3D3D; // body text  (11.3:1 ✓ AAA)               (was #3C3C43)
+$pd-grey-900: #1A1A1A; // primary text (17.2:1 ✓ AAA)             (was #1C1C1E)
+
+// ── Text ──
+// Aliases into the grey scale. $pd-text-disabled fails WCAG AA (2.3:1) —
+// only valid on `:disabled` / `aria-disabled` controls per WCAG 2.1
+// exemption. Never use for general "muted" body copy; use text-tertiary.
+$pd-text-primary:     $pd-grey-900;
+$pd-text-secondary:   $pd-grey-800;
+$pd-text-tertiary:    $pd-grey-700; // = #616161, AA at 5.3:1 on white
+$pd-text-placeholder: $pd-grey-600;
+$pd-text-disabled:    $pd-grey-500;
+$pd-text-inverse:     #FFFFFF;      // outside grey scale (top)
+
+// ── Surface ──
+// Four distinct background levels, all with unique values so two surfaces
+// never visually merge. White is off-scale (there is no grey-0).
+//
+//   primary    #FFFFFF   — page bg / floating cards
+//   secondary  grey-50   — section bg / subtle inset
+//   tertiary   grey-100  — nested card on a secondary bg / deeper inset
+//   hover      grey-200  — press / hover feedback (any surface)
+//
+// Retired tokens:
+//   - `surface-elevated` (was #FFFFFF = surface-primary) — use
+//      `surface-primary`; visual lift comes from `box-shadow` only.
+//
+// `surface-hover` doubles as press-state bg. `border-light` (grey-100) now
+// sits one step lighter than the hover fill (grey-200), so a light-bordered
+// card keeps a faint visible edge through press. Use `border-default`
+// (grey-400) for cards that need a stronger outline.
+$pd-surface-primary:   #FFFFFF;
+$pd-surface-secondary: $pd-grey-50;  // section bg / subtle inset    (was grey-100)
+$pd-surface-tertiary:  $pd-grey-100; // nested card on secondary bg  (new)
+$pd-surface-hover:     $pd-grey-200; // universal press / hover bg
+
+// ── Border ──
+// Two hairline weights, deliberately one grey-step apart:
+//   • `border-divider` (grey-200) — separators / dividers: pd-divider, list-item
+//     rows, tab underline, step connectors, section rules. The visible hairline.
+//   • `border-light`   (grey-100) — PRESSABLE outlines (pd-card / pd-button). Sits
+//     one step lighter than the press-state fill (surface-hover = grey-200) so a
+//     bordered card keeps a faint edge while pressed. Do NOT use for dividers.
+// (`border-divider` was briefly retired for duplicating border-light; it now
+//  legitimately diverges — dividers read too light at grey-100 on device.)
+$pd-border-default: $pd-grey-400;
+$pd-border-divider: $pd-grey-200;  // separators / dividers — the visible hairline
+$pd-border-light:   $pd-grey-100;  // pressable card/button outlines only (press-edge)
+$pd-border-input:   $pd-grey-300;
+
+// ── Overlay ──
+$pd-scrim-light: rgba(0, 0, 0, 0.3);
+$pd-scrim-standard: rgba(0, 0, 0, 0.4);
+$pd-scrim-heavy: rgba(0, 0, 0, 0.6);
+
+// ── Typography — Font Family ──
+// 使用平台原生字体，中文优先（App 主语言为中文）：
+//   'PingFang SC'   → iOS / macOS 的中文系统字体
+//   'Noto Sans SC'  → Android / 部分桌面浏览器的中文系统字体
+// 后续为通用系统字体兜底链。
+$pd-font-family: 'PingFang SC', 'Noto Sans SC', -apple-system,
+  BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', 'Arial', sans-serif;
+
+// ── Typography — Display-Brand Font ──
+// 仅用于品牌时刻 / 营销显眼场景的高亮字体（阿里妈妈数黑体，单一 Bold 权重）。
+// 由 App.vue 的 @font-face 本地加载（~1.4MB ttf）。请通过 .pd-font-display-brand
+// 工具类或 @include pd-font-display-brand mixin 选择性使用，不要替换全局正文。
+// 详见 doc/DESIGN_SYSTEM.md §2.5。
+$pd-font-family-display-brand: 'Alimama ShuHeiTi', 'PingFang SC', 'Noto Sans SC',
+  -apple-system, BlinkMacSystemFont, sans-serif;
+
+// ── Typography — Sizes (rpx) ──
+//
+// Letter-spacing: kept at 0 across all CJK-bearing tokens. CSS `letter-spacing`
+// applies between every glyph, including each Chinese character — Apple HIG
+// tracking values (originally tuned for SF Pro Latin) cause CJK characters to
+// either overlap (negative tracking) or drift apart (positive tracking).
+// The only token that keeps tracking is `overline`, which is uppercase Latin.
+//
+// Line-heights for body* are intentionally generous (~1.45×) for CJK breathing
+// room — Chinese characters carry more visual weight per line than Latin.
+$pd-display-lg: 90rpx;
+$pd-display-lg-lh: 104rpx;
+$pd-display-lg-ls: 0;
+
+$pd-display-md: 72rpx;
+$pd-display-md-lh: 88rpx;
+$pd-display-md-ls: 0;
+
+$pd-heading-1: 64rpx;
+$pd-heading-1-lh: 80rpx;
+$pd-heading-1-ls: 0;
+
+$pd-heading-2: 48rpx;
+$pd-heading-2-lh: 64rpx;
+$pd-heading-2-ls: 0;
+
+$pd-heading-3: 40rpx;
+$pd-heading-3-lh: 56rpx;
+$pd-heading-3-ls: 0;
+
+$pd-heading-4: 36rpx;     // 18px — smallest heading (semibold)
+$pd-heading-4-lh: 56rpx;
+$pd-heading-4-ls: 0;
+
+$pd-body-lg: 32rpx;       // 16px — primary body / mobile-readable baseline
+$pd-body-lg-lh: 48rpx;    // 1.50× for CJK readability
+$pd-body-lg-ls: 0;
+
+$pd-body-sm: 28rpx;       // 14px — secondary body
+$pd-body-sm-lh: 44rpx;    // 1.57× — relaxed CJK reading leading (was 40rpx/1.43×)
+$pd-body-sm-ls: 0;
+
+$pd-caption: 24rpx;
+$pd-caption-lh: 32rpx;
+$pd-caption-ls: 0;
+
+// `caption-sm` (22rpx / 11px) retired — Chinese characters at 11px lose
+// radical distinction. If you need fine print, use `caption` (12px min).
+
+// Overline keeps positive tracking — it's used exclusively for uppercase Latin
+// labels where wider letter-spacing improves recognition. CJK should never
+// use `overline` (set in Guidelines below).
+$pd-overline: 20rpx;
+$pd-overline-lh: 26rpx;
+$pd-overline-ls: 0.5px;
+
+// ── Typography — Weights ──
+$pd-font-regular: 400;
+$pd-font-medium: 500;
+$pd-font-semibold: 600;
+$pd-font-bold: 700;
+
+// ── Spacing (8px grid) ──
+$pd-space-half: 8rpx;   // 4px
+$pd-space-1: 16rpx;     // 8px
+$pd-space-1-5: 24rpx;   // 12px
+$pd-space-2: 32rpx;     // 16px
+$pd-space-3: 48rpx;     // 24px
+$pd-space-4: 64rpx;     // 32px
+$pd-space-5: 80rpx;     // 40px
+$pd-space-6: 96rpx;     // 48px
+$pd-space-8: 128rpx;    // 64px
+$pd-space-10: 160rpx;   // 80px
+
+// ── Border Radius ──
+$pd-radius-xs: 4rpx;
+$pd-radius-sm: 8rpx;
+$pd-radius-md: 16rpx;
+$pd-radius-lg: 24rpx;
+$pd-radius-xl: 32rpx;
+$pd-radius-2xl: 48rpx; // 24px — large "card sitting on surface" top corners (拼团详情 first card)
+$pd-radius-pill: 200rpx;
+$pd-radius-circle: 50%;
+
+// ── Elevation ──
+$pd-elevation-0: none;
+$pd-elevation-1: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+$pd-elevation-2: 0 4rpx 16rpx rgba(0, 0, 0, 0.10);
+$pd-elevation-3: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+// Upward-cast mirror of elevation-3 (same blur/alpha, negated y). For a sheet
+// whose TOP edge must read as lifted off content ABOVE it — 拼团详情's content
+// sheet over the hero map. Every other elevation casts downward, which paints
+// nothing at a top seam, so raising the tier there does literally nothing.
+// Tier 3, not 4: by role such a sheet is a bottom sheet (= tier 4), but tier 4's
+// 16% black read too heavy over the pale map. Pick an upward tier by how much
+// contrast the backdrop gives you, not by the surface's role.
+$pd-elevation-3-up: 0 -8rpx 32rpx rgba(0, 0, 0, 0.12);
+$pd-elevation-4: 0 16rpx 48rpx rgba(0, 0, 0, 0.16);
+$pd-elevation-brand: 0 4rpx 16rpx rgba(203, 29, 69, 0.08);
+// Softer brand shadow — all-sides ambient bloom used by cards that float over
+// a secondary surface. From the group-card spec: 0 0 20px rgba(197,37,19,.05).
+$pd-elevation-brand-soft: 0 0 40rpx rgba(197, 37, 19, 0.05);
+
+// ── Opacity ──
+$pd-opacity-disabled: 0.38;
+$pd-opacity-hover: 0.08;
+$pd-opacity-pressed: 0.12;
+$pd-opacity-scrim: 0.40;
+// Heavier scrim for text laid over USER-UPLOADED imagery, where the backdrop is
+// unknowable. 0.40 is tuned for dimming behind a modal; over a bright photo
+// (white mailer bag, overexposed shot) it only composites to #999 = 2.85:1 with
+// white text, failing AA. 0.60 → #666 = 5.74:1, which holds even on pure white.
+// Don't reuse `scrim` for this — different job, and it silently fails.
+$pd-opacity-scrim-heavy: 0.60;
+$pd-opacity-muted: 0.50;
+
+// ── Z-Index ──
+$pd-z-base: 0;
+$pd-z-raised: 1;
+$pd-z-sticky: 100;
+$pd-z-dropdown: 200;
+$pd-z-overlay: 300;
+$pd-z-modal: 400;
+$pd-z-toast: 500;
+$pd-z-tooltip: 600;
+
+// ── Motion — Duration ──
+// `instant` is 150ms (not 100ms) — research suggests <150ms reads as a flash
+// rather than a transition, especially for users with cognitive processing
+// differences. Use for hover/press feedback where the change is small but
+// should still be perceptible as motion.
+$pd-duration-instant: 150ms; // hover, press feedback (was 100ms)
+$pd-duration-fast:    200ms; // small transitions (border, color)
+$pd-duration-normal:  300ms; // slide-in, expand, drawer
+$pd-duration-slow:    450ms; // page transitions, modals
+
+// Loop durations — for perpetual `animation: ... infinite` (spinners, pulses,
+// shimmer). Kept separate from UI durations because their job is different:
+// long enough to be readable but short enough to feel responsive.
+$pd-duration-loop:      1000ms; // spinner, loader rotation
+$pd-duration-loop-slow: 1500ms; // pulse, breath, skeleton shimmer
+
+// ── Motion — Easing ──
+// - standard:    most UI transitions (default for pd-transition mixin)
+// - decelerate:  elements entering the viewport (slow down at rest)
+// - accelerate:  elements exiting the viewport (speed up as they leave)
+// - spring:      micro-interactions where overshoot communicates feedback
+//                (badge pop-in, success checkmark, like tap). Avoid for
+//                functional UI that should feel definitive (button press).
+// - linear:      use ONLY for continuous loops (spinners) where any easing
+//                creates visible "pulses" each cycle.
+$pd-ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+$pd-ease-decelerate: cubic-bezier(0, 0, 0, 1);
+$pd-ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+$pd-ease-spring:     cubic-bezier(0.175, 0.885, 0.32, 1.275);
+$pd-ease-linear:     linear;
+
+// ── Icon Sizes ──
+$pd-icon-sm: 32rpx;
+$pd-icon-md: 40rpx;
+$pd-icon-lg: 48rpx;
+
+// ── Touch Targets ──
+$pd-touch-md: 80rpx;
+$pd-touch-lg: 88rpx;

@@ -1,0 +1,191 @@
+// ============================================================================
+// Pindo 设计系统 — Showcase 内容页布局规则（the rule）
+// ============================================================================
+// 任何新增的 showcase 内容页都必须 @import 这个 partial，不要把 .pg / .pg-header
+// / .h3 / .desc / .token-card / .rule / .code-block 等 chrome 样式抄到自己的
+// scoped <style> 里。修改时只改这一份，所有页面跟随更新。
+//
+// 详见 doc/DESIGN_SYSTEM.md §16.4「新增 showcase 页面的步骤」。
+//
+// 用法：
+//   <style lang="scss" scoped>
+//   @import '@/styles/doc-page.scss';
+//   // 这里只写当前页 specific 的样式（如 .swatch / .matrix / .brand-badge 等）
+//   </style>
+//
+// ⚠️ 这个 partial 只定义 *跨页面共享* 的 chrome。页面专属的
+// 数据展示（swatch grid、matrix、weight row 等）仍写在各自页面里。
+// ============================================================================
+
+@import './tokens.scss';
+@import './mixins.scss';
+
+// ── Page container ──────────────────────────────────────────────────────────
+.pg {
+  padding: 0 $pd-space-2 $pd-space-5;
+
+  // pd-card 根治后不再自带 margin-bottom（doc/pd-card-默认外边距-根治方案.md）。
+  // demo 页里卡片常直排在 .pg（无 gap）下，会与相邻说明贴死 → 给【直接子】卡片补
+  // example 间距。只匹配直接子，避免影响嵌套在 sec-card 等容器里的卡片。
+  // 本文件仅服务 showcase（生产 App 零引用）。
+  > :deep(.pd-card) {
+    margin-bottom: $pd-space-3;
+  }
+}
+
+// ── Page header ─────────────────────────────────────────────────────────────
+// 标准结构：
+//   <view class="pg-header">
+//     <view class="pg-header__row">
+//       <text class="pg-header__title">页面标题</text>
+//       <view class="status-badge"><text class="status-badge__text">稳定</text></view>
+//     </view>
+//     <text class="pg-header__desc">一句话页面定位。</text>
+//   </view>
+.pg-header {
+  padding: $pd-space-2 0 $pd-space-3;
+  border-bottom: 1rpx solid $pd-border-light;
+  margin-bottom: $pd-space-2;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: $pd-space-1;
+  }
+
+  &__title {
+    @include pd-type(heading-1);
+    color: $pd-text-primary;
+  }
+
+  &__desc {
+    @include pd-type(body-lg);
+    color: $pd-text-tertiary;
+    display: block;
+    margin-top: $pd-space-1;
+    line-height: 42rpx;
+  }
+}
+
+// .status-badge has been retired in favor of <pd-badge variant="label" color="…">.
+// Page status pills now dogfood the real component:
+//   <pd-badge variant="label" color="success" text="稳定" />  ← stable pages
+//   <pd-badge variant="label" color="brand"   text="新" />    ← new / experimental
+//   <pd-badge variant="label" color="warning" text="Beta" />  ← if needed
+// 详见 §16.4 Badge rule。
+
+// ── Section heading + lead description ──────────────────────────────────────
+// 标准结构：每个 section 用 .h3 起头，可选 .desc 作 lead，下面接内容卡片。
+//
+// ⚠️ 间距规则（由 §16.4 强制，不要在页面里 inline override 这些 margin）：
+//   - Section 之间间距 ≥ space-5（80rpx）→ .h3 自带 margin-top: space-5
+//   - 段落（同 section 内的同级内容块）之间 ≥ space-3（48rpx）→ .desc /
+//     .token-card / .code-block 自带 margin-bottom: space-3
+//   - 第一个 .h3 已经被 pg-header 的 border 隔开，所以 margin-top 收紧到 space-3
+.h3 {
+  @include pd-type(heading-3);
+  color: $pd-text-primary;
+  display: block;
+  margin: $pd-space-5 0 $pd-space-2;
+
+  &:first-of-type { margin-top: $pd-space-3; }
+}
+
+.desc {
+  @include pd-type(body-sm);
+  color: $pd-text-tertiary;
+  display: block;
+  margin-bottom: $pd-space-3;
+}
+
+// ── Mono utility ────────────────────────────────────────────────────────────
+.mono {
+  font-family: 'SF Mono', Consolas, monospace;
+}
+
+// ── Token / sample card（最常用的内容卡） ────────────────────────────────
+// 标准结构：白底卡片 + elevation-1。子元素自带分隔线，最后一项无线。
+.token-card {
+  background: $pd-surface-primary;
+  border-radius: $pd-radius-md;
+  box-shadow: $pd-elevation-1;
+  overflow: hidden;
+  margin-bottom: $pd-space-3;
+}
+
+// type-row 系列 — 字号 / 字重 / 字体样例的标准行结构。
+// 垂直 padding 用 space-3 (48rpx) 给较大的 display 样本足够呼吸空间；
+// 水平用 space-2 (32rpx) 与卡片其他位置一致。
+.type-row {
+  padding: $pd-space-3 $pd-space-2;
+  border-bottom: 1rpx solid $pd-border-light;
+  &:last-child { border-bottom: none; }
+}
+.type-sample { color: $pd-text-primary; display: block; }
+// space-1 (16rpx) gap separates sample from meta — half (8rpx) was too tight
+// under the larger display-lg / display-md / heading-1 samples.
+.type-meta { margin-top: $pd-space-1; }
+.type-token { @include pd-type(body-sm); color: $pd-brand-500; display: inline; }
+.type-spec { @include pd-type(body-sm); color: $pd-text-placeholder; display: inline; margin-left: $pd-space-1; }
+
+// ── Code block — 暗色代码示例 ──────────────────────────────────────────
+// 简化版：一段连续代码用 .code-block 包，里面每行用 .code-line。
+.code-block {
+  background: #1A1A1A;
+  border-radius: $pd-radius-md;
+  padding: $pd-space-2;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  margin-bottom: $pd-space-3;
+}
+
+.code-line {
+  @include pd-type(body-sm);
+  font-family: 'SF Mono', Consolas, monospace;
+  color: #DFDFDF;
+  display: block;
+  white-space: pre;  // 保留代码示例里的缩进与多空格
+}
+
+.code-comment { color: #8B8B8B; }
+
+// ── Do / Don't 规范条目 ───────────────────────────────────────────────────
+// 标准结构：
+//   <view class="rule rule--do">
+//     <text class="rule__icon">+</text>
+//     <text class="rule__text">推荐做法说明</text>
+//   </view>
+//   <view class="rule rule--dont">
+//     <text class="rule__icon">-</text>
+//     <text class="rule__text">禁止做法说明</text>
+//   </view>
+.rule {
+  display: flex;
+  align-items: flex-start;
+  gap: $pd-space-1;
+  padding: $pd-space-1-5;
+  border-radius: $pd-radius-md;
+  margin-bottom: $pd-space-1;
+
+  &--do { background: $pd-success-bg; }
+  &--dont { background: $pd-error-bg; }
+
+  &__icon {
+    @include pd-type(heading-4);
+    font-weight: $pd-font-bold;
+    flex-shrink: 0;
+    width: 40rpx;
+    text-align: center;
+  }
+
+  &__text {
+    @include pd-type(body-sm);
+    color: $pd-text-secondary;
+    flex: 1;
+    line-height: 36rpx;
+  }
+}
+
+.rule--do .rule__icon { color: $pd-success-text; }
+.rule--dont .rule__icon { color: $pd-error-text; }

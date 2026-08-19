@@ -1,0 +1,23 @@
+{
+  "name": "Pindo Coral Design System",
+  "appid": "__UNI__SHOWCASE",
+  "description": "Public showcase of the Pindo Coral Design System",
+  "versionName": "1.0.0",
+  "versionCode": 100,
+  "transformPx": false,
+  "vueVersion": "3",
+  "locale": "zh-Hans",
+  "fallbackLocale": "zh-Hans",
+  "h5": {
+    "title": "Pindo Coral Design System",
+    "router": {
+      "mode": "hash",
+      "base": "./"
+    },
+    "optimization": {
+      "treeShaking": {
+        "enable": false
+      }
+    }
+  }
+}
